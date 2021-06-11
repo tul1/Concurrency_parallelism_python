@@ -75,11 +75,11 @@ resize_queue = ClosableQueue()
 upload_queue = ClosableQueue()
 done_queue = ClosableQueue()
 
-download_threads = start_threads(3, download, download_queue, resize_queue)
+download_threads = start_threads(4, download, download_queue, resize_queue)
 resize_threads = start_threads(4, resize, resize_queue, upload_queue)
-upload_threads = start_threads(5, upload, upload_queue, done_queue)
+upload_threads = start_threads(4, upload, upload_queue, done_queue)
 
-for _ in range(5):
+for _ in range(10):
     download_queue.put('titi')
 
 stop_threads(download_queue, download_threads)
