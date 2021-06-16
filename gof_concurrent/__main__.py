@@ -55,7 +55,7 @@ def count_neighbors(y, x, get):
 # @cache
 def game_logic(state, neighbors):
     # raise OSError('Problem with I/O')
-    time.sleep(0.1)
+    time.sleep(0.01)
     if state == ALIVE:
         if neighbors < 2:
             return EMPTY    # Die: Too few

@@ -34,7 +34,7 @@ def count_neighbors(y, x, get):
 
 async def game_logic(state, neighbors):
     # raise OSError('Problem with I/O')
-    await asyncio.sleep(0.1)
+    await asyncio.sleep(0.01)
     if state == ALIVE:
         if neighbors < 2:
             return EMPTY    # Die: Too few
