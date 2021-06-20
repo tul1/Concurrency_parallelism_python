@@ -141,3 +141,8 @@ end = time.time()
 delta = end - start
 print(f'Took {delta:.3f}')
 print(columns)
+
+for thread in threads:
+    in_queue.close()
+for thread in threads:
+    thread.join()
