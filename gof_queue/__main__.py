@@ -36,6 +36,7 @@ class StoppableWorker(Thread):
 
 def game_logic(state, neighbors):
     time.sleep(0.01)
+    # raise OSError('Problem with I/O')
     if state == ALIVE:
         if neighbors < 2:
             return EMPTY    # Die: Too few
@@ -109,7 +110,7 @@ def simulate_pipeline(grid, in_queue, out_queue):
     for item in out_queue:
         y, x, next_state = item
         if isinstance(next_state, Exception):
-            raise SimulationError
+            raise SimulationError('Error has been raised')
         next_grid.set(y, x, next_state)
 
     return next_grid
@@ -134,15 +135,16 @@ grid.set(2, 4, ALIVE)
 
 columns = ColumnsPrinter()
 start = time.time()
-for _ in range(10):
-    columns.append(str(grid))
-    grid = simulate_pipeline(grid, in_queue, out_queue)
-end = time.time()
-delta = end - start
-print(f'Took {delta:.3f}')
-print(columns)
-
-for thread in threads:
-    in_queue.close()
-for thread in threads:
-    thread.join()
+try:
+    for _ in range(10):
+        columns.append(str(grid))
+        grid = simulate_pipeline(grid, in_queue, out_queue)
+    end = time.time()
+    delta = end - start
+    print(f'Took {delta:.3f}')
+    print(columns)
+finally:
+    for thread in threads:
+        in_queue.close()
+    for thread in threads:
+        thread.join()

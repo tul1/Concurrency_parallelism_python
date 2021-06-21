@@ -19,7 +19,8 @@ class Grid:
     def __str__(self):
         return '\n'.join(map(lambda row: ''.join(row), self.rows))
 
-def count_neighbors(y, x, get):
+async def count_neighbors(y, x, get):
+    await asyncio.sleep(0.01)
     n_ = get(y - 1, x + 0) # North
     ne = get(y - 1, x + 1) # Northeast
     e_ = get(y + 0, x + 1) # East
@@ -48,7 +49,7 @@ async def game_logic(state, neighbors):
 
 async def step_cell(y, x, get, set):
     state = get(y,x)
-    neighbors = count_neighbors(y, x, get)
+    neighbors = await count_neighbors(y, x, get)
     next_state = await game_logic(state, neighbors)
     set(y, x, next_state)
 

@@ -12,12 +12,22 @@ class AsyncConnectionBase:
         self.writer.write(data)
         await self.writer.drain()
 
-    async def received(self):
+    async def receive(self):
         line = await self.reader.readline()
         if not line:
             raise EOFError('Connection closed')
         return line[:-1].decode()
-    
+
+import random
+
+WARMER = 'Warmer'
+COLDER = 'Colder'
+UNSURE = 'Unsure'
+CORRECT = 'Correct'
+
+class UnknownCommandError(Exception):
+    pass
+
 class AsyncSession(AsyncConnectionBase):
     def __init__(self, *args):
         super().__init__(*args)
@@ -35,11 +45,11 @@ class AsyncSession(AsyncConnectionBase):
                 case ['PARAM', lower, upper]:
                     self.set_params(int(lower), int(upper))
                 case ['NUMBER', *_]:
-                    self.send_number()
+                    await self.send_number()
                 case ['REPORT', decision]:
                     self.receive_report(decision)
                 case _:
-                    raise UnknowCommandError(command)
+                    raise UnknownCommandError(command)
 
     def set_params(self, lower, upper):
         self._clear_state(lower, upper)
@@ -57,7 +67,6 @@ class AsyncSession(AsyncConnectionBase):
         guess = self.next_guess()
         self.guesses.append(guess)
         await self.send(format(guess))
-
 
     def receive_report(self, decision):
         last = self.guesses[-1]
@@ -122,7 +131,7 @@ async def handle_async_connection(reader, writer):
     session = AsyncSession(reader, writer)
     try:
         await session.loop()
-    except EOFError:
+    except EOFError as e:
         pass
 
 async def run_async_server(address):
